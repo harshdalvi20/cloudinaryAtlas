@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Display Images</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f5f5f5;
+    }
+    .container {
+      text-align: center;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      color: #333;
+    }
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    input[type="text"] {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      width: 200px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #imageContainer {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-around; /* Align images with space around them */
+    }
+    #imageContainer img {
+      max-width: 45%; /* Set maximum width for each image */
+      border-radius: 5px;
+    }
+    #imageContainer p {
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Display Images</h1>
+    <label for="pid">Enter PID:</label>
+    <input type="text" id="pidInput">
+    <button onclick="displayImages()">Display Images</button>
+
+    <div id="imageContainer"></div>
+  </div>
+
+  <script>
+    async function displayImages() {
+      const pid = document.getElementById('pidInput').value;
+
+      try {
+        const response = await fetch(`http://localhost:3000/images?pid=${pid}`);
+        const data = await response.json();
+
+        if (response.ok) {
+          const imageUrls = data.imageUrls;
+          const imageContainer = document.getElementById('imageContainer');
+          imageContainer.innerHTML = ''; // Clear previous images
+
+          if (imageUrls.length > 0) {
+            imageUrls.forEach(imageUrl => {
+              const imgElement = document.createElement('img');
+              imgElement.src = imageUrl;
+              imgElement.alt = 'Image';
+              imageContainer.appendChild(imgElement);
+            });
+          } else {
+            const noImageText = document.createElement('p');
+            noImageText.textContent = 'No images found for the provided PID.';
+            imageContainer.appendChild(noImageText);
+          }
+        } else {
+          console.error('Failed to fetch images:', data.message);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+  </script>
+</body>
+</html>
